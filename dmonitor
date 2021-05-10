@@ -5,8 +5,8 @@
 # Required-Stop:
 # Should-Start:      
 # Should-Stop:
-# Default-Start:     
-# Default-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
 # Short-Description: Monitoring network traffic.
 # Description:       Monitoring network traffic.
 ### END INIT INFO
