@@ -8,4 +8,6 @@
 $ git clone git@github.com:LeeLin2602/dmonitor.git
 $ cd dmonitor
 $ sudo ./install.sh
+$ sudo service dmonitor start
+$ curl localhost 9899
 ```
