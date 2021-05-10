@@ -1,0 +1,10 @@
+[Unit]
+Description=dmonitor
+
+[Service]
+User=dmonitor
+ExecStart=/etc/init.d/dmonitor
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

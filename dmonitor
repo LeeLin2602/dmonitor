@@ -1,0 +1,98 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          dmonitor
+# Required-Start:    $all
+# Required-Stop:
+# Should-Start:      
+# Should-Stop:
+# Default-Start:     
+# Default-Stop:
+# Short-Description: Monitoring network traffic.
+# Description:       Monitoring network traffic.
+### END INIT INFO
+
+su dmonitor
+path=/usr/local/bin/dmonitor/
+run_path=/var/run/dmonitor/
+rec_path=/var/dmonitor/
+port=9899
+
+source /etc/dmonitor.conf.sh
+
+http_path=${path}http.sh
+proc_path=${path}data_process.sh
+
+data_path=${run_path}static
+http_pid=${run_path}http.pid
+dstat_pid=${run_path}dstat.pid
+
+case "$1" in 
+start)
+    if [ "$(lsof -t -i:$port)" != "" ]
+    then
+        echo "Port $port occupied by process: $(lsof -t -i:$port)"
+        echo "Failed to start, try: dmonitor force"
+        exit 1
+    fi
+
+    data_file=${rec_path}$(date +%Y_%m%d_%H%M)_$RANDOM
+    echo $data_file > $data_path
+    echo > $data_file
+ 
+    dstat -n --output $data_file 2>/dev/null 1>/dev/null &
+    echo $!>$dstat_pid   
+
+    $http_path $port $data_file $proc_path &
+    echo $!>$http_pid
+    ;;
+stop)
+    $0 status
+    if [ "$?" == "0" ]
+    then   
+        echo ""
+        echo "stopping dmonitor:"
+        echo ""
+        
+        echo "killing http process"
+        if [ -f $http_pid ]; then kill `cat $http_pid`; rm $http_pid; fi
+        
+        echo "killing dstat process"
+        if [ -f $dstat_pid ]; then kill `cat $dstat_pid`; rm $dstat_pid; fi
+        if [ -f $data_path ]; then rm $data_path; fi
+
+        echo "killing netcat process"
+        for p in $(lsof -t -i:$port) 
+        do
+            kill -s 9 $p
+        done
+        
+        echo ""
+        echo "dmonitor stopped."
+    fi
+    ;;
+restart)
+    $0 stop
+    $0 start
+    ;;
+force)
+    for p in $(lsof -t -i:$port) 
+    do
+        kill -s 9 $p
+    done
+    $0 start
+    ;;
+status)
+    if [[ -f $http_pid ]] && [[ -f $dstat_pid ]] && [[ -f $data_path ]]
+    then
+        echo "dmonitor is running."
+    else
+        echo "domonitor is NOT running."
+        exit 1
+    fi
+    ;;
+*)
+    echo "Usage: $0 {start|stop|status|restart|force}"
+esac
+
+exit 0 
+
