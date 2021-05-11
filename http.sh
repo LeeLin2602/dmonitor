@@ -20,5 +20,5 @@ do
     body="${body}<p>Recent 1 Hour: $(cat $data | tail -n +7 | tail -n $hour | $proc)</p>"
     body="${body}<br>"
     body="${body}<p>dmonitor: network traffic monitor powered by <a style='text-decoration:none;' href='https://github.com/LeeLin2602'>Lin Lee</a></p>"
-	echo -e "${header}${html_start}<table><tr><td><div class='txt'>${body}</div></td></tr></table>${html_end}" | nc -l -p $1 -q 0 2>/dev/null >/dev/null
+	echo -e "${header}${html_start}<table><tr><td><div class='txt'>${body}</div></td></tr></table>${html_end}" | timeout 10 nc -l -p $1 -q 0 2>/dev/null >/dev/null
 done
