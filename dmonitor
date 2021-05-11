@@ -11,7 +11,7 @@
 # Description:       Monitoring network traffic.
 ### END INIT INFO
 
-su dmonitor
+
 path=/usr/local/bin/dmonitor/
 run_path=/var/run/dmonitor/
 rec_path=/var/dmonitor/
@@ -49,6 +49,14 @@ stop)
     $0 status
     if [ "$?" == "0" ]
     then   
+        echo ""
+        echo "summarizing data"
+        echo ""
+        
+        data_file="$(cat $data_path)"
+        res=$(cat $data_file | tail -n +7 | $proc_path)
+        echo $res > $data_file
+
         echo ""
         echo "stopping dmonitor:"
         echo ""
