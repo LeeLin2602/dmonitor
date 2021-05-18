@@ -5,6 +5,7 @@ if ! [ $(id -u) = 0  ]; then
     exit 1
 fi
 
+apt install dstat -y
 useradd --system --shell=/bin/nologin --no-create-home dmonitor
 
 mkdir /usr/local/bin/dmonitor
